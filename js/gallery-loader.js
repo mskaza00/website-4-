@@ -21,7 +21,7 @@
    ============================================================= */
 
 const SBS_REPO_OWNER = "mskaza00";
-const SBS_REPO_NAME = "shotsbyskaza-website";
+const SBS_REPO_NAME = "website-4-";
 
 const SBS_IMAGE_EXT = /\.(jpe?g|png|webp|gif|avif)$/i;
 
@@ -36,13 +36,23 @@ function sbsFormatLabel(slug) {
     .replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
+// How long a folder listing is trusted before we ask GitHub again. Short enough
+// that newly-added/removed photos show up on a normal refresh; long enough to
+// avoid re-fetching every folder on every single click while browsing around.
+const SBS_CACHE_TTL_MS = 2 * 60 * 1000;
+
 async function sbsFetchFolder(path) {
   const cacheKey = `sbs-cache:${path}`;
   try {
     const cached = sessionStorage.getItem(cacheKey);
-    if (cached) return JSON.parse(cached);
+    if (cached) {
+      const parsed = JSON.parse(cached);
+      if (parsed && typeof parsed.t === "number" && Date.now() - parsed.t < SBS_CACHE_TTL_MS) {
+        return parsed.data;
+      }
+    }
   } catch (e) {
-    /* sessionStorage unavailable — skip caching */
+    /* sessionStorage unavailable or corrupt — skip caching */
   }
 
   const url = `https://api.github.com/repos/${SBS_REPO_OWNER}/${SBS_REPO_NAME}/contents/${path}`;
@@ -54,7 +64,7 @@ async function sbsFetchFolder(path) {
   const data = await res.json();
   const list = Array.isArray(data) ? data : [];
   try {
-    sessionStorage.setItem(cacheKey, JSON.stringify(list));
+    sessionStorage.setItem(cacheKey, JSON.stringify({ t: Date.now(), data: list }));
   } catch (e) {
     /* quota exceeded or unavailable — fine, just skip caching */
   }
