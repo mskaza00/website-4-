@@ -331,11 +331,12 @@ h1, h2, h3 {
 .nav-toggle[aria-expanded="true"] span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
 
 /* ---------------- Homepage gallery lead ----------------
-   The homepage has no hero text — the photo grid starts right below
-   the header and runs full-bleed edge to edge. */
+   The homepage has no hero text — the photo grid starts below the header,
+   with some clear breathing room in between rather than sitting flush
+   against it. */
 
 .gallery-lead {
-  padding-top: var(--header-h);
+  padding-top: calc(var(--header-h) + 2.5rem);
   padding-bottom: 2.5rem;
 }
 
