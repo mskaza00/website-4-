@@ -8,14 +8,13 @@
   const header = document.querySelector(".site-header");
   if (!header) return;
 
-  // Background fades from solid to fully transparent over this many px of scroll.
-  const FADE_RANGE = 320;
+  // Header stays fully solid at all times so it never becomes see-through
+  // over the photo grid underneath it.
   let ticking = false;
 
   function update() {
     const y = window.scrollY || window.pageYOffset;
-    const alpha = Math.max(0, 1 - y / FADE_RANGE);
-    header.style.setProperty("--header-alpha", alpha.toFixed(3));
+    header.style.setProperty("--header-alpha", "1");
     header.classList.toggle("is-scrolled", y > 4);
     ticking = false;
   }
